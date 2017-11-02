@@ -20,42 +20,44 @@ import static com.mongodb.client.model.Filters.*;
 
 @Service
 public class TweetService {
+	Block<Document> printBlock = new Block<Document>() {
+		@Override
+		public void apply(final Document document) {
+			System.out.println(document);
+			// parse result obtained from collection
+			String user = (String) document.get("user");
+			int id   = Integer.parseInt((String) document.get("id"));
+			String content = (String) document.get("content");
+			Date date = new Date();
+			// create a new tweet object and store in result array
+			Tweet tweet = new Tweet(id, user, content, date);
+			tweets.add(tweet);
+		}
+	};
+
 	private static List<Tweet> tweets = new ArrayList<Tweet>();
-	private static int tweetCount = 3;
 	// create a connection to mongoDB
-	MongoClient mongoClient = new MongoClient();
-	MongoDatabase database = mongoClient.getDatabase("spring");
-	
-	
+	MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://db_admin:db_admin@ds243295.mlab.com:43295/spring-kenny"));
+	MongoDatabase database = mongoClient.getDatabase("spring-kenny");
+
+
 	public String getUserByName(String name) {
 		MongoCollection<Document> collection = database.getCollection("users");
 		FindIterable<Document> cursor = collection.find(eq("name", name));
-		// TODO: change return type to user
 		return (String) cursor.first().get("name");
 	}
 
-	// for development only
-	static {
-		tweets.add(new Tweet(1, "Kenny", "Happy Halloween", new Date()));
-		tweets.add(new Tweet(2, "Kenny", "Merry Christmas", new Date()));
-		tweets.add(new Tweet(3, "Kenny", "Happy New Year", new Date()));
-	}
-
 	public List<Tweet> retrieveTweets(String user) {
-		List<Tweet> filteredTweets = new ArrayList<Tweet>();
-		for (Tweet tweet : tweets) {
-			if (tweet.getUser().equals(user))
-				filteredTweets.add(tweet);
-		}
-		return filteredTweets;
+		MongoCollection<Document> collection = database.getCollection("tweets");
+		tweets.clear();
+		collection.find(eq("user", user)).forEach(printBlock);
+		return this.tweets;
 	}
 
 	public Tweet retrieveTweet(int id) {
-		for (Tweet tweet : tweets) {
-			if (tweet.getId() == id)
-				return tweet;
-		}
-		return null;
+		MongoCollection<Document> collection = database.getCollection("tweets");
+		collection.find(eq("id", id)).forEach(printBlock);
+		return this.tweets.get(0);
 	}
 
 	public void updateTweet(Tweet tweet) {
@@ -63,17 +65,18 @@ public class TweetService {
 		tweets.add(tweet);
 	}
 
-	public void addTweet(String name, String desc, Date targetDate) {
-		tweets.add(new Tweet(++tweetCount, name, desc, targetDate));
+	public void addTweet(String name, String content, Date targetDate) {
+		MongoCollection<Document> collection = database.getCollection("tweets");
+		long count = collection.count(new Document()) + 1;
+		Document document = new Document("name", name)
+               .append("content", content)
+               .append("stars", 3)
+               .append("id", Long.toString(count));
+		collection.insertOne(document);
 	}
 
 	public void deleteTweet(int id) {
-		Iterator<Tweet> iterator = tweets.iterator();
-		while (iterator.hasNext()) {
-			Tweet tweet = iterator.next();
-			if (tweet.getId() == id) {
-				iterator.remove();
-			}
-		}
+		MongoCollection<Document> collection = database.getCollection("tweets");
+		collection.deleteOne(eq("id", Integer.toString(id)));
 	}
 }

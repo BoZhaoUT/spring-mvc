@@ -6,9 +6,9 @@
 		<caption>Your tweets</caption>
 		<thead>
 			<tr>
-				<th>Description</th>
+				<th>Content</th>
 				<th>Date</th>
-				<th>Completed</th>
+				<th></th>
 				<th></th>
 			</tr>
 		</thead>

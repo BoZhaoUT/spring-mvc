@@ -88,7 +88,7 @@ public class Tweet {
 	@Override
 	public String toString() {
 		return String.format(
-				"Todo [id=%s, user=%s, desc=%s, targetDate=%s, isDone=%s]", id,
+				"Tweet [id=%d, user=%s, desc=%s, targetDate=%s]", id,
 				user, content, targetDate);
 	}
 

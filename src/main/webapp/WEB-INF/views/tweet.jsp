@@ -4,10 +4,10 @@
 	<form:form method="post" commandName="tweet">
 		<form:hidden path="id" />
 		<fieldset class="form-group">
-			<form:label path="desc">Description</form:label>
-			<form:input path="desc" type="text" class="form-control"
+			<form:label path="content">Content</form:label>
+			<form:input path="content" type="text" class="form-control"
 				required="required" />
-			<form:errors path="desc" cssClass="text-warning" />
+			<form:errors path="content" cssClass="text-warning" />
 		</fieldset>
 		<fieldset class="form-group">
 			<form:label path="targetDate">Target Date</form:label>
