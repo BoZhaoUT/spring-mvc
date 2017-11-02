@@ -18,9 +18,10 @@
 					<td>${tweet.content}</td>
 					<td><fmt:formatDate pattern="dd/MM/yyyy"
 							value="${tweet.targetDate}" /></td>
-					<td><a type="button" class="btn btn-primary"
-						href="/update-tweet?id=${tweet.id}">Edit</a> <a type="button"
-						class="btn btn-warning" href="/delete-tweet?id=${tweet.id}">Delete</a>
+					<td> 
+						<a type="button"
+							class="btn btn-warning" href="/delete-tweet?id=${tweet.id}">Delete
+						</a>
 					</td>
 				</tr>
 			</c:forEach>

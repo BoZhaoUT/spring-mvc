@@ -27,26 +27,28 @@ public class TweetController {
 	@Autowired
 	private TweetService service;
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		binder.registerCustomEditor(Date.class, new CustomDateEditor(
-				dateFormat, false));
-	}
-
+	/**
+	 * Display all tweets posted by a particular user.
+	 */
 	@RequestMapping(value = "/list-tweets", method = RequestMethod.GET)
 	public String showTweetsList(ModelMap model) {
 		String user = getLoggedInUserName();
-		model.addAttribute("tweets", service.retrieveTweets(user));
+		model.addAttribute("tweets", service.retrieveTweetsByName(user));
 		return "list-tweets";
 	}
 
+	/**
+	 * Show a page to allow users adding a new tweet.
+	 */
 	@RequestMapping(value = "/add-tweet", method = RequestMethod.GET)
 	public String showAddTweetPage(ModelMap model) {
 		model.addAttribute("tweet", new Tweet());
 		return "tweet";
 	}
 
+	/**
+	 * Add a new tweet.
+	 */
 	@RequestMapping(value = "/add-tweet", method = RequestMethod.POST)
 	public String addTweet(ModelMap model, @Valid Tweet tweet, BindingResult result) {
 
@@ -59,6 +61,10 @@ public class TweetController {
 		return "redirect:/list-tweets";
 	}
 
+	/**
+	 * Get current logged in user's name.
+	 * @return user's name from his credentials
+	 */
 	private String getLoggedInUserName() {
 		Object principal = SecurityContextHolder.getContext()
 				.getAuthentication().getPrincipal();
@@ -69,30 +75,32 @@ public class TweetController {
 		return principal.toString();
 	}
 
+	/**
+	 * Modify a tweet's content.
+	 */
 	@RequestMapping(value = "/update-tweet", method = RequestMethod.GET)
 	public String showUpdateTweetPage(ModelMap model, @RequestParam int id) {
 		model.addAttribute("tweet", service.retrieveTweet(id));
 		return "tweet";
 	}
 
-	@RequestMapping(value = "/update-tweet", method = RequestMethod.POST)
-	public String updateTweet(ModelMap model, @Valid Tweet tweet,
-			BindingResult result) {
-		if (result.hasErrors())
-			return "tweet";
-
-		tweet.setUser(getLoggedInUserName());
-		service.updateTweet(tweet);
-
-		model.clear();// to prevent request parameter "name" to be passed
-		return "redirect:/list-tweets";
-	}
-
+	/**
+	 * Delete a tweet based on its id.
+	 * @param id of this tweet
+	 */
 	@RequestMapping(value = "/delete-tweet", method = RequestMethod.GET)
 	public String deleteTweet(@RequestParam int id) {
-		service.deleteTweet(id);
-
+		String user = getLoggedInUserName();
+		service.deleteTweet(id, user);
 		return "redirect:/list-tweets";
 	}
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(
+				dateFormat, false));
+	}
+
 
 }

@@ -12,18 +12,27 @@ import com.kenny.model.Tweet;
 import com.kenny.tweet.service.TweetService;
 
 @RestController
-public class TodoRestController {
+public class TweetRestController {
 	@Autowired
 	private TweetService service;
 
-	@RequestMapping(value = "/tweet/", method = RequestMethod.GET)
-	public List<Tweet> listAllTodos() {
-		List<Tweet> users = (List<Tweet>) service.retrieveTweet(1);
-		return users;
+	/**
+	 * Return all tweets in JSON.
+	 * @return all tweets in JSON
+	 */
+	@RequestMapping(value = "/tweets", method = RequestMethod.GET)
+	public List<Tweet> listAllTweets() {
+		List<Tweet> tweets = (List<Tweet>) service.retrieveAllTweets();
+		return tweets;
 	}
 
-	@RequestMapping(value = "/todo/{id}", method = RequestMethod.GET)
-	public Tweet retrieveTodo(@PathVariable("id") int id) {
+	/**
+	 * Return a specific tweet by id in JSON.
+	 * @param id of a tweet
+	 * @return a specific tweet by id
+	 */
+	@RequestMapping(value = "/tweet/{id}", method = RequestMethod.GET)
+	public Tweet retrieveTweetById(@PathVariable("id") int id) {
 		return service.retrieveTweet(id);
 	}
 }
